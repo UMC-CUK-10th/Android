@@ -53,6 +53,7 @@
         android:id="@+id/ic_happy"
         android:src="@drawable/ic_happy"
         app:layout_constraintTop_toBottomOf="@+id/tv_explanation"
+        app:layout_constraintBottom_toTopOf="@id/tv_happy"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="27dp"/>
@@ -61,6 +62,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/tv_happy"
         app:layout_constraintTop_toBottomOf="@+id/ic_happy"
+        app:layout_constraintBottom_toTopOf="@id/ic_excited"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="5.87dp"
@@ -73,6 +75,7 @@
         android:id="@+id/ic_excited"
         android:src="@drawable/ic_excited"
         app:layout_constraintTop_toBottomOf="@+id/tv_happy"
+        app:layout_constraintBottom_toTopOf="@id/tv_excited"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="19dp"/>
@@ -81,6 +84,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/tv_excited"
         app:layout_constraintTop_toBottomOf="@+id/ic_excited"
+        app:layout_constraintBottom_toTopOf="@id/ic_soso"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="6.87dp"
@@ -93,6 +97,7 @@
         android:id="@+id/ic_soso"
         android:src="@drawable/ic_soso"
         app:layout_constraintTop_toBottomOf="@+id/tv_excited"
+        app:layout_constraintBottom_toTopOf="@id/tv_soso"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="19dp"/>
@@ -101,6 +106,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/tv_soso"
         app:layout_constraintTop_toBottomOf="@+id/ic_soso"
+        app:layout_constraintBottom_toTopOf="@id/ic_anxious"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="6.87dp"
@@ -113,6 +119,7 @@
         android:id="@+id/ic_anxious"
         android:src="@drawable/ic_anxious"
         app:layout_constraintTop_toBottomOf="@+id/tv_soso"
+        app:layout_constraintBottom_toTopOf="@id/tv_anxious"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="19dp"/>
@@ -121,6 +128,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/tv_anxious"
         app:layout_constraintTop_toBottomOf="@+id/ic_anxious"
+        app:layout_constraintBottom_toTopOf="@id/ic_angry"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="6.87dp"
@@ -133,6 +141,7 @@
         android:id="@+id/ic_angry"
         android:src="@drawable/ic_angry"
         app:layout_constraintTop_toBottomOf="@+id/tv_anxious"
+        app:layout_constraintBottom_toTopOf="@id/tv_angry"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="19dp"/>
