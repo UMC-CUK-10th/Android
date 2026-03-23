@@ -5,11 +5,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import com.example.week02.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
+
+    private fun changeFragment(fragment: Fragment){
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_fcv, fragment)
+            .commit()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,36 +32,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.main_fcv, fragment_home())
+            .replace(R.id.main_fcv, HomeFragment())
             .commit()
 
         binding.mainBnv.setOnItemSelectedListener{item ->
             when(item.itemId){
-                R.id.Fragment_home ->{
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_fcv, fragment_home())
-                        .commit()
-                }
-                R.id.Fragment_puchase ->{
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_fcv, fragment_purchase())
-                        .commit()
-                }
-                R.id.Fragment_wishlist ->{
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_fcv, fragment_wishlist())
-                        .commit()
-                }
-                R.id.Fragment_cart ->{
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_fcv, fragment_cart())
-                        .commit()
-                }
-                R.id.Fragment_profile ->{
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_fcv, fragment_profile())
-                        .commit()
-                }
+                R.id.Fragment_home -> changeFragment(HomeFragment())
+                R.id.Fragment_puchase -> changeFragment(PurchaseFragment())
+                R.id.Fragment_wishlist -> changeFragment(WishlistFragment())
+                R.id.Fragment_cart -> changeFragment(CartFragment())
+                R.id.Fragment_profile -> changeFragment(ProfileFragment())
             }
             true
         }
