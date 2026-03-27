@@ -1,18 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment_wishlist">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".WishlistFragment">
 
     <TextView
+        android:id="@+id/tv_wishlist"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="위시리스트"
         android:textSize="28sp"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:layout_marginTop="94dp"
-        android:layout_marginStart="24dp"/>
+        android:paddingTop="28dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginEnd="34dp"/>
 
-</FrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/wishlistRcv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_wishlist"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
