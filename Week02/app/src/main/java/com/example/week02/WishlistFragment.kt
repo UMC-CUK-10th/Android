@@ -12,6 +12,17 @@ class WishlistFragment : Fragment() {
 
     lateinit var binding: FragmentWishlistBinding
 
+    /*private val wishlistProductList = List(30){index ->
+        WishlistProductData(
+            image = if (index%2==0) R.drawable.shoes3 else R.drawable.socks1,
+            name = "Nike test product ${index + 1}",
+            subtitle = "test subtitle",
+            colors = "${(index % 5) + 1} Colors",
+            price = "US$${100 + index}",
+        )
+    }*/
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,6 +49,7 @@ class WishlistFragment : Fragment() {
         val adapter = WishlistProductAdapter(
             productList = wishlistProductList,
             onItemClicked = {product ->})
+
 
         binding.wishlistRcv.adapter = adapter
         binding.wishlistRcv.layoutManager = GridLayoutManager(requireContext(),2)

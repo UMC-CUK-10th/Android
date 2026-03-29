@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.week02.databinding.ItemPurchaseBinding
 
 class PurchaseProductAdapter(
-    private val productList: MutableList<PurchaseProductData>,
+    private val productList: List<PurchaseProductData>,
     private val onItemClicked: (PurchaseProductData)-> Unit
 ): RecyclerView.Adapter<PurchaseProductViewHolder>() {
     override fun onCreateViewHolder(
