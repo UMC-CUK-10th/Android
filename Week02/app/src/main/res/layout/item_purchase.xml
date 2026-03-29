@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <FrameLayout
+        android:id="@+id/imageFrame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintDimensionRatio="1:1"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        
+        <ImageView
+            android:id="@+id/purchase_image"
+            android:layout_width="184dp"
+            android:layout_height="184dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/socks1"/>
+
+        <ImageButton
+            android:id="@+id/purchase_heart_button"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="top|end"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="6dp"
+            android:src="@drawable/blankheart"/>
+
+    </FrameLayout>
+    
+    <TextView
+        android:id="@+id/purchase_name"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:text="Nike Everyday Plus Cushioned"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/purchase_bestseller"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/purchase_subtitle"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:text="product"
+        android:textColor="#767676"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@+id/purchase_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/purchase_colors"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:text="5 Colors"
+        android:textSize="14sp"
+        android:textColor="#767676"
+        app:layout_constraintTop_toBottomOf="@+id/purchase_subtitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/purchase_price"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:text="US$100"
+        android:textSize="14sp"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/purchase_colors"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/purchase_bestseller"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:text="BestSeller"
+        android:textColor="#FC5100"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/purchase_name"
+        app:layout_constraintTop_toBottomOf="@+id/imageFrame"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

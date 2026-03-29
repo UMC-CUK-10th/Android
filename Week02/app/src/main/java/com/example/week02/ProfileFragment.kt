@@ -5,23 +5,34 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import com.example.week02.databinding.FragmentProfileBinding
 
 
 class ProfileFragment : Fragment() {
+
+    lateinit var binding: FragmentProfileBinding
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_profile,container,false)
-        val button2 = view.findViewById<Button>(R.id.button2)
-        button2.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.main_fcv, EditProfileFragment())
-                .addToBackStack(null)
-                .commit()
+
+        binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.button2.setOnClickListener {
+            val nextFragment = EditProfileFragment()
+
+            parentFragmentManager.beginTransaction().apply {
+
+                replace(R.id.main_fcv, nextFragment)
+
+                commit()
+            }
         }
-        return view
     }
 }

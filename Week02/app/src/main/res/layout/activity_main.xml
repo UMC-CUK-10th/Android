@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:itemTextColor="@color/black"
         app:itemIconTint="@color/black"
-        app:itemBackground="@color/white" />
+        app:itemBackground="@color/white"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
