@@ -12,12 +12,23 @@
         android:text="위시리스트"
         android:textSize="34sp"
         android:textStyle="bold"
-        android:textColor="@color/white1"
+        android:textColor="@color/black1"
 
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
         android:layout_marginStart="24dp"
         android:layout_marginTop="78dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_wish"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wishlist" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
