@@ -9,8 +9,54 @@ import com.example.week02.databinding.ItemPurchaseBinding
 
 class PurchaseProductAdapter(
     private val productList: List<PurchaseProductData>,
-    private val onItemClicked: (PurchaseProductData)-> Unit
-): RecyclerView.Adapter<PurchaseProductViewHolder>() {
+    private val isWishlistMode : Boolean = false,
+    private val onItemClicked: (PurchaseProductData)-> Unit,
+    private val onHeartClicked: (PurchaseProductData)-> Unit
+): RecyclerView.Adapter<PurchaseProductAdapter.PurchaseProductViewHolder>() {
+
+    inner class PurchaseProductViewHolder(val binding: ItemPurchaseBinding):
+        RecyclerView.ViewHolder(binding.root){
+        fun bind(product: PurchaseProductData){
+            binding.purchaseImage.setImageResource(product.image)
+            binding.purchaseName.text = product.name
+            binding.purchaseSubtitle.text = product.subtitle
+            binding.purchaseColors.text = product.colors
+            binding.purchasePrice.text = product.price
+
+            if(isWishlistMode){
+                binding.purchaseHeartButton.visibility = View.GONE
+            }else {
+                binding.purchaseHeartButton.visibility = View.VISIBLE
+
+                if(product.isWished){
+                    binding.purchaseHeartButton.setImageResource(R.drawable.heart)
+                }
+                else{
+                    binding.purchaseHeartButton.setImageResource(R.drawable.blankheart)
+                }
+                binding.purchaseHeartButton.setOnClickListener {
+                    product.isWished = !product.isWished
+
+                    if (product.isWished) {
+                        binding.purchaseHeartButton.setImageResource(R.drawable.heart)
+                    } else {
+                        binding.purchaseHeartButton.setImageResource(R.drawable.blankheart)
+                    }
+                    onHeartClicked(product)
+                }
+            }
+
+            if(product.isBestSeller){
+                binding.purchaseBestseller.visibility = View.VISIBLE
+            }
+            else{
+                binding.purchaseBestseller.visibility = View.GONE
+            }
+
+
+        }
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -34,36 +80,3 @@ class PurchaseProductAdapter(
     override fun getItemCount(): Int = productList.size
 }
 
-class PurchaseProductViewHolder(val binding: ItemPurchaseBinding):
-        RecyclerView.ViewHolder(binding.root){
-    fun bind(product: PurchaseProductData){
-        binding.purchaseImage.setImageResource(product.image)
-        binding.purchaseName.text = product.name
-        binding.purchaseSubtitle.text = product.subtitle
-        binding.purchaseColors.text = product.colors
-        binding.purchasePrice.text = product.price
-
-        if(product.isBestSeller){
-            binding.purchaseBestseller.visibility = View.VISIBLE
-        }
-        else{
-            binding.purchaseBestseller.visibility = View.GONE
-        }
-
-        if(product.isWished){
-            binding.purchaseHeartButton.setImageResource(R.drawable.heart)
-        }
-        else{
-            binding.purchaseHeartButton.setImageResource(R.drawable.blankheart)
-        }
-        binding.purchaseHeartButton.setOnClickListener {
-            product.isWished = !product.isWished
-
-            if (product.isWished) {
-                binding.purchaseHeartButton.setImageResource(R.drawable.heart)
-            } else {
-                binding.purchaseHeartButton.setImageResource(R.drawable.blankheart)
-            }
-        }
-    }
-}
