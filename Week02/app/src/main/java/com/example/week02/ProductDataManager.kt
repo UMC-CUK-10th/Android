@@ -29,8 +29,13 @@ class ProductDataManager(private val context: Context) {
         return context.dataStore.data.map { prefs ->
             val jsonString = prefs[PRODUCT_KEY]
             if (jsonString != null){
-                val type = object : TypeToken<List<PurchaseProductData>>(){}.type
-                gson.fromJson(jsonString, type)
+                try{
+                    val type = object : TypeToken<List<PurchaseProductData>>(){}.type
+                    gson.fromJson(jsonString, type)
+                } catch(e: Exception){
+                    emptyList()
+                }
+
             }else{
                 emptyList()
             }

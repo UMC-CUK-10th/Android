@@ -17,15 +17,30 @@ class PurchaseProductAdapter(
     inner class PurchaseProductViewHolder(val binding: ItemPurchaseBinding):
         RecyclerView.ViewHolder(binding.root){
         fun bind(product: PurchaseProductData){
+            basicInfo(product)
+            BestSeller(product)
+            WishHeart(product)
+        }
+        fun basicInfo(product: PurchaseProductData){
             binding.purchaseImage.setImageResource(product.image)
             binding.purchaseName.text = product.name
             binding.purchaseSubtitle.text = product.subtitle
             binding.purchaseColors.text = product.colors
             binding.purchasePrice.text = product.price
-
+        }
+        fun BestSeller(product: PurchaseProductData){
+            if(product.isBestSeller){
+                binding.purchaseBestseller.visibility = View.VISIBLE
+            }
+            else{
+                binding.purchaseBestseller.visibility = View.GONE
+            }
+        }
+        fun WishHeart(product: PurchaseProductData){
             if(isWishlistMode){
                 binding.purchaseHeartButton.visibility = View.GONE
-            }else {
+            }
+            else {
                 binding.purchaseHeartButton.visibility = View.VISIBLE
 
                 if(product.isWished){
@@ -45,15 +60,6 @@ class PurchaseProductAdapter(
                     onHeartClicked(product)
                 }
             }
-
-            if(product.isBestSeller){
-                binding.purchaseBestseller.visibility = View.VISIBLE
-            }
-            else{
-                binding.purchaseBestseller.visibility = View.GONE
-            }
-
-
         }
     }
 
