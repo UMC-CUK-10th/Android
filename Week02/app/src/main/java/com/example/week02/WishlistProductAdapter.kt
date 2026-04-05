@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.week02.databinding.ItemWishlistBinding
 
 class WishlistProductAdapter (
-    private val productList: MutableList<WishlistProductData>,
+    private val productList: List<WishlistProductData>,
     private val onItemClicked: (WishlistProductData)-> Unit
 ): RecyclerView.Adapter<WishlistProductViewHolder>(){
     override fun onCreateViewHolder(
