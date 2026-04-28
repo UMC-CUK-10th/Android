@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.week02.databinding.ItemProductBinding
 
 class HomeProductAdapter(
-    private val productList: MutableList<HomeProductData>,
+    private val productList: List<HomeProductData>,
     private val onItemClicked:(HomeProductData)-> Unit
 ): RecyclerView.Adapter<NewProductViewHolder>() {
 
