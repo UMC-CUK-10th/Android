@@ -7,4 +7,8 @@
 
     <style name="Theme.Nike" parent="Base.Theme.Nike" />
 
+    <style name="CircleImage">
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>
