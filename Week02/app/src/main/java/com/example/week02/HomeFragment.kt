@@ -5,8 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.week02.databinding.FragmentHomeBinding
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
     lateinit var binding: FragmentHomeBinding
@@ -23,13 +25,14 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         val newProductList = mutableListOf(
             HomeProductData(R.drawable.shoes1, "Air Jordan XXXVI", "US\$185"),
             HomeProductData(R.drawable.shoes2, "Nike Air Force 1 '07", "US\$115")
         )
 
+        val adapter = HomeProductAdapter(newProductList, onItemClicked = {product ->})
 
-        val adapter = HomeProductAdapter(newProductList, onItemClicked = { product -> })
 
         binding.homeRcv.adapter = adapter
         binding.homeRcv.layoutManager =
