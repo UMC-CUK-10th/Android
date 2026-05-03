@@ -1,14 +1,15 @@
-package com.example.week02
+package com.example.week02.ui.fragment
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.week02.ui.adapter.HomeProductAdapter
+import com.example.week02.model.HomeProductData
+import com.example.week02.R
 import com.example.week02.databinding.FragmentHomeBinding
-import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
     lateinit var binding: FragmentHomeBinding
@@ -31,7 +32,7 @@ class HomeFragment : Fragment() {
             HomeProductData(R.drawable.shoes2, "Nike Air Force 1 '07", "US\$115")
         )
 
-        val adapter = HomeProductAdapter(newProductList, onItemClicked = {product ->})
+        val adapter = HomeProductAdapter(newProductList, onItemClicked = { product -> })
 
 
         binding.homeRcv.adapter = adapter

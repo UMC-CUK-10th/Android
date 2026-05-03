@@ -1,13 +1,11 @@
-package com.example.week02
+package com.example.week02.ui.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
-
-
+import androidx.fragment.app.Fragment
+import com.example.week02.R
 
 class EditProfileFragment : Fragment() {
 

@@ -1,5 +1,7 @@
-package com.example.week02
+package com.example.week02.network
 
+import com.example.week02.model.UserListResponse
+import com.example.week02.model.UserResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

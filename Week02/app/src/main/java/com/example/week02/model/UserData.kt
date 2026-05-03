@@ -1,4 +1,4 @@
-package com.example.week02
+package com.example.week02.model
 
 import com.google.gson.annotations.SerializedName
 

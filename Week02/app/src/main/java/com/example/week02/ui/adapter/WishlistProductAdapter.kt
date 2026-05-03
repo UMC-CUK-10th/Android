@@ -1,10 +1,9 @@
-package com.example.week02
+package com.example.week02.ui.adapter
 
-import android.text.Layout
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.week02.model.WishlistProductData
 import com.example.week02.databinding.ItemWishlistBinding
 
 class WishlistProductAdapter (
