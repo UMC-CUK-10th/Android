@@ -1,4 +1,4 @@
-package com.example.week02
+package com.example.week02.ui
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -6,8 +6,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import com.example.week02.R
 import com.example.week02.databinding.ActivityMainBinding
+import com.example.week02.ui.fragment.CartFragment
+import com.example.week02.ui.fragment.HomeFragment
+import com.example.week02.ui.fragment.ProfileFragment
+import com.example.week02.ui.fragment.PurchaseFragment
+import com.example.week02.ui.fragment.WishlistFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
@@ -25,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)){view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)){ view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets

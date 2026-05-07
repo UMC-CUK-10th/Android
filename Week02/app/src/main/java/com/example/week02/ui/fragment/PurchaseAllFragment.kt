@@ -1,4 +1,4 @@
-package com.example.week02
+package com.example.week02.ui.fragment
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.week02.repository.ProductDataManager
+import com.example.week02.ui.adapter.PurchaseProductAdapter
+import com.example.week02.model.PurchaseProductData
+import com.example.week02.R
 import com.example.week02.databinding.FragmentPurchaseAllBinding
 import kotlinx.coroutines.launch
 
@@ -32,7 +36,7 @@ class PurchaseAllFragment : Fragment() {
         val adapter = PurchaseProductAdapter(
             productList = emptyList(),
             onItemClicked = {},
-            onHeartClicked = {clickedProduct ->
+            onHeartClicked = { clickedProduct ->
                 lifecycleScope.launch {
                     clickedProduct.isWished = !clickedProduct.isWished
                     dataManager.saveProducts(currentProductList)
@@ -45,7 +49,7 @@ class PurchaseAllFragment : Fragment() {
                 if(savedList.isEmpty()){
                     val initialData = List(30){index ->
                         PurchaseProductData(
-                            image = if (index%2==0) R.drawable.shoes3 else R.drawable.socks1,
+                            image = if (index % 2 == 0) R.drawable.shoes3 else R.drawable.socks1,
                             name = "Nike test product ${index + 1}",
                             subtitle = "test subtitle",
                             colors = "${(index % 5) + 1} Colors",

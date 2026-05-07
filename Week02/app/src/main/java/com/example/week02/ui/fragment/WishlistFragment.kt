@@ -1,4 +1,4 @@
-package com.example.week02
+package com.example.week02.ui.fragment
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import com.example.week02.databinding.FragmentWishlistBinding
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.week02.repository.ProductDataManager
+import com.example.week02.ui.adapter.PurchaseProductAdapter
+import com.example.week02.model.PurchaseProductData
 import kotlinx.coroutines.launch
 
 class WishlistFragment : Fragment() {
@@ -37,8 +40,8 @@ class WishlistFragment : Fragment() {
                 val adapter = PurchaseProductAdapter(
                     productList = wishlistedItems,
                     isWishlistMode = true,
-                    onItemClicked = {product ->},
-                    onHeartClicked = {product ->}
+                    onItemClicked = { product -> },
+                    onHeartClicked = { product -> }
                 )
                 binding.wishlistRcv.adapter = adapter
                 binding.wishlistRcv.layoutManager = GridLayoutManager(requireContext(),2)

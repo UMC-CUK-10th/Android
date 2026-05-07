@@ -1,6 +1,11 @@
+@file:Suppress("DEPRECATION")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.android)
+    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -37,6 +42,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+    ksp {
+        arg("dagger.hilt.disableModulesHaveInstallInCheck", "true")
+        arg("dagger.fastInit", "enabled")
+    }
 }
 
 dependencies {
@@ -59,6 +71,8 @@ dependencies {
 dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
+    implementation("com.google.dagger:hilt-android:2.59.2")
+    ksp("com.google.dagger:hilt-android-compiler:2.59.2")
 }
 dependencies {
     implementation("com.google.android.material:material:1.9.0")

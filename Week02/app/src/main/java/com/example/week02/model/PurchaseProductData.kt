@@ -1,4 +1,4 @@
-package com.example.week02
+package com.example.week02.model
 
 data class PurchaseProductData (
     val image: Int,

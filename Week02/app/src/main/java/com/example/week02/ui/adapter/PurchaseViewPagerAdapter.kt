@@ -1,7 +1,10 @@
-package com.example.week02
+package com.example.week02.ui.adapter
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.week02.ui.fragment.PurchaseAllFragment
+import com.example.week02.ui.fragment.PurchaseSaleFragment
+import com.example.week02.ui.fragment.PurchaseTopFragment
 
 class PurchaseViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
