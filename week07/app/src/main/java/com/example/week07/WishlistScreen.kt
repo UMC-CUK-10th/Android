@@ -1,50 +1,45 @@
 package com.example.week07
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.week07.ProductData
-import com.example.week07.R
 
-val WishlistProductList = listOf(
-    ProductData(1, R.drawable.socks1, "Nike Everyday Plus Cushioned","Training Ankle Socks(6 Pairs)","5 Colours","US/$10"),
-    ProductData(2, R.drawable.shoes5,"Air Jordan 1 Mid","Men's Shoes","1 Colours","US/$125")
-)
 @Composable
-fun WishlistScreen() {
-    Column (
+fun WishlistScreen(viewModel: SharedViewModel) { // ✨ 뷰모델 받아오기
+    val wishedIds by viewModel.wishedIds.collectAsState()
+
+    // ✨ 전체 30개 상품 중, 찜(하트)을 누른 ID들만 걸러냅니다!
+    val wishlistProducts = viewModel.allProducts.filter { wishedIds.contains(it.id) }
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 50.dp, start = 20.dp)
+            .padding(top = 50.dp, start = 16.dp, end = 16.dp)
     ) {
         Text(
             text = "위시리스트",
             fontSize = 30.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp, start = 4.dp)
         )
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            contentPadding = PaddingValues(bottom = 32.dp)
         ) {
-            items(
-                items = WishlistProductList,
-                key = { it.id }
-            ) { product ->
-                ProductItem(product)
+            items(items = wishlistProducts, key = { it.id }) { product ->
+                ProductItem(
+                    product = product.copy(isWished = true), // 위시리스트니까 무조건 하트 켜짐
+                    onHeartClick = { viewModel.toggleWishlist(product.id) } // 한번 더 누르면 찜 해제!
+                )
             }
         }
     }
