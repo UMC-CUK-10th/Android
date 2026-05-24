@@ -3,6 +3,8 @@ package com.example.week7
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +14,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,8 +38,17 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import coil.compose.AsyncImage
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Path
+import androidx.compose.foundation.pager.PageSize
 
-// 1. 화면 라우팅 정의
+// ==========================================
+// 1. 네비게이션 라우팅 정의 및 데이터 모델 선언
+// ==========================================
+
 sealed class Screen(val route: String, val iconRes: Int, val label: String) {
     object Home : Screen("home", R.drawable.home, "홈")
     object Shop : Screen("shop", R.drawable.buyimage, "구매하기")
@@ -44,7 +57,6 @@ sealed class Screen(val route: String, val iconRes: Int, val label: String) {
     object Profile : Screen("profile", R.drawable.profileimage, "프로필")
 }
 
-// 2. 데이터 모델
 data class Product(
     val id: String,
     val name: String,
@@ -52,6 +64,40 @@ data class Product(
     val price: String,
     val imageRes: Int
 )
+
+// ReqRes API 응답용 데이터 구조체
+data class ReqResResponse(
+    val data: UserData
+)
+
+data class UserData(
+    val id: Int,
+    val email: String,
+    val first_name: String,
+    val last_name: String,
+    val avatar: String
+)
+
+// Retrofit 서비스 인터페이스
+interface ReqResService {
+    @GET("api/users/{id}")
+    suspend fun getUser(@Path("id") id: Int): ReqResResponse
+}
+
+// Retrofit API 클라이언트 싱글톤 오브젝트
+object ApiClient {
+    val service: ReqResService by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://reqres.in/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ReqResService::class.java)
+    }
+}
+
+// ==========================================
+// 2. 메인 액티비티 및 기본 구조 영역
+// ==========================================
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +114,9 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
 
+    // 💡 [실시간 위시리스트 연동 변수] 하트가 눌린 상품의 ID들을 추적 관리하는 리스트 상태
+    val wishlistedIds = remember { mutableStateListOf<String>() }
+
     Scaffold(
         bottomBar = { NikeBottomNavigation(navController) }
     ) { innerPadding ->
@@ -77,8 +126,31 @@ fun MainScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) { HomeScreen() }
-            composable(Screen.Shop.route) { ShopScreen() }
-            composable(Screen.Wishlist.route) { WishlistScreen() }
+
+            // 구매하기 화면에 하트 상태 전송
+            composable(Screen.Shop.route) {
+                ShopScreen(
+                    wishlistedIds = wishlistedIds,
+                    onWishClick = { productId ->
+                        if (wishlistedIds.contains(productId)) {
+                            wishlistedIds.remove(productId)
+                        } else {
+                            wishlistedIds.add(productId)
+                        }
+                    }
+                )
+            }
+
+            // 위시리스트 화면에 하트 리스트 전송
+            composable(Screen.Wishlist.route) {
+                WishlistScreen(
+                    wishlistedIds = wishlistedIds,
+                    onWishClick = { productId ->
+                        wishlistedIds.remove(productId) // 위시리스트에서 하트 풀면 즉시 해제
+                    }
+                )
+            }
+
             composable(Screen.Bag.route) {
                 BagScreen(onOrderClick = {
                     navController.navigate(Screen.Shop.route) {
@@ -130,7 +202,7 @@ fun NikeBottomNavigation(navController: NavHostController) {
 }
 
 // ==========================================
-// 개별 화면 구현부
+// 3. 개별 화면 구현부 (Jetpack Compose)
 // ==========================================
 
 @Composable
@@ -138,7 +210,7 @@ fun HomeScreen() {
     val scrollState = rememberScrollState()
     val homeProducts = listOf(
         Product("home_1", "Air Jordan XXXVI", "Men's Shoes", "US$185", R.drawable.nikeaf1),
-        Product("home_2", "Nike Air Force 1 '07", "Men's Shoes", "US$165", R.drawable.nikeaf2)
+        Product("home_2", "Air Jordan XXXVI Low", "Men's Shoes", "US$165", R.drawable.nikeaf2)
     )
 
     Column(
@@ -149,7 +221,6 @@ fun HomeScreen() {
     ) {
         Spacer(modifier = Modifier.height(48.dp))
 
-        // 1. 타이틀 영역
         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
             Text(
                 text = "Discover",
@@ -167,20 +238,18 @@ fun HomeScreen() {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 2. 메인 배너
         Image(
             painter = painterResource(id = R.drawable.homebanner),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(400.dp)
-                .padding(horizontal = 24.dp), // 양옆에 여백 주기 적용
+                .padding(horizontal = 24.dp),
             contentScale = ContentScale.Crop
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 3. 섹션 타이틀
         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
             Text(
                 text = "What's new",
@@ -199,7 +268,6 @@ fun HomeScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 4. 가로 스크롤 상품 리스트
         LazyRow(
             contentPadding = PaddingValues(horizontal = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -226,19 +294,22 @@ fun HomeScreen() {
             }
         }
         Spacer(modifier = Modifier.height(40.dp))
-    } // <- 닫는 괄호 에러 나던 부분 해결!
+    }
 }
 
 @Composable
-fun ShopScreen() {
+fun ShopScreen(
+    wishlistedIds: List<String>,
+    onWishClick: (String) -> Unit
+) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("전체", "Tops & T-Shirts", "sale")
 
     val shopProducts = listOf(
-        Product("shop_1", "Nike Everyday Plus Cushioned", "Training Ankle Socks (6 Pairs)", "US$10", R.drawable.nikesocks),
-        Product("shop_2", "Nike Elite Crew", "Basketball Socks\n7 Colours", "US$16", R.drawable.nikeaf3),
-        Product("shop_3", "Nike Air Force 1 '07", "Women's Shoes\n5 Colours", "US$115", R.drawable.nikeaf4),
-        Product("shop_4", "Jordan Nike Air Force 1 '07Essentials", "Men's Shoes\n2 Colours", "US$115", R.drawable.nikeshoes)
+        Product("shop_1", "Nike Everyday Plus Cushioned", "Training Ankle Socks (6 Pairs)", "US$10", R.drawable.nikeshoes),
+        Product("shop_2", "Nike Elite Crew", "Basketball Socks\n7 Colours", "US$16", R.drawable.nikesocks),
+        Product("shop_3", "Nike Air Force 1 '07", "Women's Shoes\n5 Colours", "US$115", R.drawable.nikeaf3),
+        Product("shop_4", "Jordan Nike Air Force 1 '07Essentials", "Men's Shoes\n2 Colours", "US$115", R.drawable.nikeaf4)
     )
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
@@ -282,14 +353,23 @@ fun ShopScreen() {
             modifier = Modifier.fillMaxSize()
         ) {
             items(items = shopProducts, key = { it.id }) { product ->
-                ShopProductItem(product)
+                ShopProductItem(
+                    product = product,
+                    isWishlisted = wishlistedIds.contains(product.id),
+                    onWishClick = onWishClick
+                )
             }
         }
     }
 }
 
 @Composable
-fun ShopProductItem(product: Product) {
+fun ShopProductItem(
+    product: Product,
+    isWishlisted: Boolean,
+    showFavoriteButton: Boolean = true, // 💡 기본값은 true로 두어 구매하기 화면에선 보이게 합니다.
+    onWishClick: (String) -> Unit = {}
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
@@ -303,15 +383,23 @@ fun ShopProductItem(product: Product) {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-            Icon(
-                painter = painterResource(id = R.drawable.wishimage),
-                contentDescription = null,
-                tint = Color.LightGray,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(12.dp)
-                    .size(20.dp)
-            )
+
+            // 💡 showFavoriteButton이 true일 때만 하트 아이콘을 그립니다.
+            if (showFavoriteButton) {
+                IconButton(
+                    onClick = { onWishClick(product.id) },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.wishimage),
+                        contentDescription = null,
+                        tint = if (isWishlisted) Color.Red else Color.LightGray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = product.name, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -321,11 +409,26 @@ fun ShopProductItem(product: Product) {
 }
 
 @Composable
-fun WishlistScreen() {
-    val wishlistProducts = listOf(
-        Product("wish_1", "Air Jordan 1 Mid", "Shoes", "US$125", R.drawable.nikesocks),
-        Product("wish_2", "Nike Everyday Plus Cushioned", "Training Ankle Socks (6 Pairs)\n5 Colours", "US$10", R.drawable.jordan1)
+fun WishlistScreen(
+    wishlistedIds: List<String>,
+    onWishClick: (String) -> Unit
+) {
+    val allShopProducts = listOf(
+        Product("shop_1", "Nike Everyday Plus Cushioned", "Training Ankle Socks (6 Pairs)", "US$10", R.drawable.nikeshoes),
+        Product("shop_2", "Nike Elite Crew", "Basketball Socks\n7 Colours", "US$16", R.drawable.nikesocks),
+        Product("shop_3", "Nike Air Force 1 '07", "Women's Shoes\n5 Colours", "US$115", R.drawable.nikeaf3),
+        Product("shop_4", "Jordan Nike Air Force 1 '07Essentials", "Men's Shoes\n2 Colours", "US$115", R.drawable.nikeaf4)
     )
+
+    val defaultWishlist = listOf(
+        Product("wish_1", "Air Jordan 1 Mid", "Shoes", "US$125", R.drawable.jordan1),
+        Product("wish_2", "Nike Everyday Plus Cushioned", "Training Ankle Socks (6 Pairs)\n5 Colours", "US$10", R.drawable.nikesocks)
+    )
+
+    val combinedWishlist = remember(wishlistedIds) {
+        val added = allShopProducts.filter { wishlistedIds.contains(it.id) }
+        defaultWishlist + added
+    }
 
     Column(
         modifier = Modifier
@@ -350,8 +453,205 @@ fun WishlistScreen() {
             verticalArrangement = Arrangement.spacedBy(24.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(items = wishlistProducts, key = { it.id }) { product ->
-                ShopProductItem(product)
+            items(items = combinedWishlist, key = { it.id }) { product ->
+                // 💡 여기에 showFavoriteButton = false를 주어 하트를 숨깁니다!
+                ShopProductItem(
+                    product = product,
+                    isWishlisted = true,
+                    showFavoriteButton = false
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ProfileScreen() {
+    var userData by remember { mutableStateOf<UserData?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        try {
+            val response = ApiClient.service.getUser(1)
+            userData = response.data
+        } catch (e: Exception) {
+            e.printStackTrace()
+            userData = UserData(
+                id = 1,
+                email = "george.bluth@reqres.in",
+                first_name = "George",
+                last_name = "Bluth",
+                avatar = "https://reqres.in/img/faces/1-image.jpg"
+            )
+        } finally {
+            isLoading = false
+        }
+    }
+
+    val followingList = listOf(
+        Product("f_1", "Janet Weaver", "Following", "https://reqres.in/img/faces/2-image.jpg", R.drawable.buyimage),
+        Product("f_2", "Emma Wong", "Following", "https://reqres.in/img/faces/3-image.jpg", R.drawable.buyimage),
+        Product("f_3", "Eve Holt", "Following", "https://reqres.in/img/faces/4-image.jpg", R.drawable.buyimage)
+    )
+    val pagerState = rememberPagerState(pageCount = { followingList.size })
+    val scrollState = rememberScrollState()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Color.Black
+            )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                AsyncImage(
+                    model = userData?.avatar ?: "https://reqres.in/img/faces/1-image.jpg",
+                    contentDescription = "User Avatar",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFF5F5F5)),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.profileimage),
+                    error = painterResource(id = R.drawable.profileimage)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val firstName = userData?.first_name ?: "George"
+                val lastName = userData?.last_name ?: "Bluth"
+
+                Text(
+                    text = "$firstName $lastName",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                OutlinedButton(
+                    onClick = { },
+                    modifier = Modifier.width(160.dp).height(45.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
+                ) {
+                    Text(text = "프로필 수정", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val menuItems = listOf(
+                        Pair(R.drawable.archive, "주문"),
+                        Pair(R.drawable.identificationcard, "패스"),
+                        Pair(R.drawable.calendarblank, "이벤트"),
+                        Pair(R.drawable.gear, "설정")
+                    )
+
+                    menuItems.forEachIndexed { index, item ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = item.first),
+                                contentDescription = item.second,
+                                modifier = Modifier.size(24.dp),
+                                tint = Color.Gray
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(text = item.second, fontSize = 12.sp, color = Color.Black)
+                        }
+                        if (index < menuItems.lastIndex) {
+                            VerticalDivider(
+                                modifier = Modifier.height(24.dp),
+                                color = Color(0xFFEEEEEE)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(color = Color(0xFFF5F5F5), thickness = 8.dp)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(text = "나이키 멤버 혜택", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "0개 사용 가능", fontSize = 13.sp, color = Color.Gray)
+                    }
+                    Icon(painter = painterResource(id = R.drawable.home), contentDescription = null, modifier = Modifier.size(16.dp))
+                }
+
+                HorizontalDivider(color = Color(0xFFF5F5F5), thickness = 8.dp)
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "팔로잉 (${followingList.size})", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(text = "편집", fontSize = 13.sp, color = Color.Gray)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 글자 안 잘리는 110.dp 할당 및 아담한 정사각형 고정 구조 완벽 킵
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxWidth().height(110.dp),
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    pageSpacing = 12.dp,
+                    pageSize = PageSize.Fixed(100.dp)
+                ) { page ->
+                    val person = followingList[page]
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0xFFEEEEEE))
+                    ) {
+                        AsyncImage(
+                            model = person.price,
+                            contentDescription = "Following Avatar",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Box(
+                    modifier = Modifier.fillMaxWidth().background(Color(0xFFF9F9F9)).padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "회원 가입일: 2025년 9월", fontSize = 12.sp, color = Color.Gray)
+                }
             }
         }
     }
@@ -411,12 +711,5 @@ fun BagScreen(onOrderClick: () -> Unit) {
                 fontSize = 18.sp
             )
         }
-    }
-}
-
-@Composable
-fun ProfileScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "프로필 화면")
     }
 }
