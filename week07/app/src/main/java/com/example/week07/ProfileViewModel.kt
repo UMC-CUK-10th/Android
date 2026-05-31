@@ -2,10 +2,12 @@ package com.example.week07
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 // ✨ 에러의 원인 해결! 상태 클래스가 myInfo와 followingList를 모두 가지도록 수정되었습니다.
 sealed class ProfileUiState {
@@ -25,17 +27,25 @@ class ProfileViewModel : ViewModel() {
     private fun fetchData() {
         viewModelScope.launch {
             try {
-                // 내 프로필 정보(1번 유저)와 팔로잉 리스트(1페이지) 데이터를 순서대로 가져옵니다.
-                val profileResponse = RetrofitClient.api.getUserProfile()
-                val listResponse = RetrofitClient.api.getUserList()
+                // 🚀 최적화: 두 API를 병렬로 호출하여 전체 로딩 시간을 단축합니다.
+                val profileDeferred = async { RetrofitClient.api.getUserProfile() }
+                val listDeferred = async { RetrofitClient.api.getUserList() }
 
-                // 성공 상태에 두 데이터를 예쁘게 포장해서 UI(ProfileScreen)로 넘겨줍니다.
+                // 두 요청이 모두 완료될 때까지 기다립니다.
+                val profileResponse = profileDeferred.await()
+                val listResponse = listDeferred.await()
+
+                // 성공 상태에 두 데이터를 패키징하여 UI로 전달합니다.
                 _uiState.value = ProfileUiState.Success(
                     myInfo = profileResponse.data,
                     followingList = listResponse.data
                 )
+            } catch (e: IOException) {
+                // 네트워크 연결 오류 등 I/O 예외 처리
+                _uiState.value = ProfileUiState.Error("네트워크 연결이 원활하지 않습니다.")
             } catch (e: Exception) {
-                _uiState.value = ProfileUiState.Error("통신 실패: ${e.message}")
+                // 기타 일반적인 에러 처리
+                _uiState.value = ProfileUiState.Error("통신 실패: ${e.localizedMessage}")
             }
         }
     }
