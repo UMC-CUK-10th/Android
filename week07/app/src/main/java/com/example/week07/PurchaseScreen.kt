@@ -1,73 +1,85 @@
 package com.example.week07
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.week07.ProductData
-import com.example.week07.R
+import kotlinx.coroutines.launch
 
-val PurchaseProductList = listOf(
-    ProductData(1, R.drawable.socks1, "Nike Elite Crew", "Basketball Socks","7 Colours","US/$16",true,true),
-    ProductData(2,R.drawable.socks1,"Nike Everyday Plus Cushioned","Training Ankle Socks(6 Pairs)","5 Colours","US/$10",false,false),
-    ProductData(3,R.drawable.shoes3,"Nike Air Force 1'07","Women's Shoes","5 Colours","US/$115",true,false),
-    ProductData(4,R.drawable.shoes4,"Jordan ENike Air Force 1'07ssentials","Men's Shoes","2 Colours","US/$115",true,true)
-)
-
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PurchaseScreen() {
-    // ✨ 1. 클릭 시 화면이 새로 고쳐지도록 리스트를 Compose '상태(State)' 리스트로 변환
-    val productList = remember { PurchaseProductList.toMutableStateList() }
+fun PurchaseScreen(viewModel: SharedViewModel) {
+    val tabs = listOf("전체", "TOPS & T-SHIRTS", "SALE")
 
-    Column (
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 50.dp, start = 20.dp)
-    ) {
-        Text(
-            text = "위시리스트",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold
-        )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            // 피그마 디자인처럼 아이템 사이 간격 조절
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            contentPadding = PaddingValues(vertical = 16.dp)
+    val pagerState = rememberPagerState(pageCount = { tabs.size })
+    val coroutineScope = rememberCoroutineScope()
+
+    val wishedIds by viewModel.wishedIds.collectAsState()
+    val allProducts = viewModel.allProducts
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // 상단 탭
+        TabRow(
+            selectedTabIndex = pagerState.currentPage,
+            containerColor = Color.White,
+            contentColor = Color.Black
         ) {
-            items(
-                items = productList, // ✨ 원본 대신 상태 리스트를 넣어줍니다.
-                key = { it.id }
-            ) { product ->
-
-                // ✨ 2. ProductItem을 호출할 때 람다 함수(onHeartClick)를 직접 채워줍니다!
-                ProductItem(
-                    product = product,
-                    onHeartClick = { clickedProduct ->
-                        // 하트 클릭 시 변수(isWished)를 반전시켜 화면을 갱신하는 로직
-                        val index = productList.indexOf(clickedProduct)
-                        if (index != -1) {
-                            productList[index] = clickedProduct.copy(isWished = !clickedProduct.isWished)
-                        }
-                    }
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        coroutineScope.launch { pagerState.animateScrollToPage(index) }
+                    },
+                    text = { Text(title) }
                 )
+            }
+        }
 
+        // 스와이프 되는 화면 영역
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            val displayProducts = if (page == 0) {
+                allProducts
+            } else {
+                emptyList()
+            }
+
+            // ✨ 리스트가 비어있을 때(Tops & T-Shirts, SALE 탭) 보여줄 빈 화면 분기 처리
+            if (displayProducts.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("등록된 상품이 없습니다.", color = Color.Gray)
+                }
+            } else {
+                // 전체 탭일 때 보여줄 상품 30개 그리드
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp)
+                ) {
+                    items(items = displayProducts, key = { it.id }) { product ->
+                        val isWished = wishedIds.contains(product.id)
+                        ProductItem(
+                            product = product.copy(isWished = isWished),
+                            onHeartClick = { viewModel.toggleWishlist(product.id) }
+                        )
+                    }
+                }
             }
         }
     }
